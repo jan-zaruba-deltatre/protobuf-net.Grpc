@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>10</LangVersion>
+        <RootNamespace>ProtoBuf.Grpc.WcfConverter</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Usign Remove="System.IO" />
+        <Using Include="System.IO" Alias="IO" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+        <PackageReference Include="System.ServiceModel.Primitives" Version="4.8.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\protobuf-net.Grpc.Reflection\protobuf-net.Grpc.Reflection.csproj" />
+    </ItemGroup>
+
+</Project>

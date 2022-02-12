@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net48</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>10</LangVersion>
+        <RootNamespace>ProtoBuf.Grpc.WcfConverter.Console</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Usign Remove="System.IO" />
+        <Using Include="System.IO" Alias="IO" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\protobuf-net.Grpc.Reflection\protobuf-net.Grpc.Reflection.csproj" />
+        <ProjectReference Include="..\WcfConverter.Library\WcfConverter.Library.csproj" />
+    </ItemGroup>
+
+</Project>

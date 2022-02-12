@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29006.145
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "protobuf-net.Grpc", "src\protobuf-net.Grpc\protobuf-net.Grpc.csproj", "{30D0874E-DA1A-497E-A181-37739A46CF32}"
 EndProject
@@ -146,6 +146,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TraderSys.Portfolios.ClientConsole", "examples\wcf-port\TraderSys\src\TraderSys.Portfolios.ClientConsole\TraderSys.Portfolios.ClientConsole.csproj", "{AC65761B-5CF5-4F3E-AF60-41F977E8070D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TraderSys.Portfolios.Shared", "examples\wcf-port\TraderSys\src\TraderSys.Portfolios.Shared\TraderSys.Portfolios.Shared.csproj", "{80479131-FE55-473E-AE68-55601AD96668}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WcfConverter", "WcfConverter", "{EFBE280B-5CD1-4AE3-8C1A-1103A94F5344}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfConverter.App", "examples\WcfConverter\WcfConverter.App\WcfConverter.App.csproj", "{C83C4425-6512-40CA-B725-347E1116FC6C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WcfConverter.Library", "examples\WcfConverter\WcfConverter.Library\WcfConverter.Library.csproj", "{FA3724D6-A509-4E2C-AA36-E74554E2622C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -400,6 +406,18 @@ Global
 		{80479131-FE55-473E-AE68-55601AD96668}.Release|Any CPU.Build.0 = Release|Any CPU
 		{80479131-FE55-473E-AE68-55601AD96668}.VS|Any CPU.ActiveCfg = Debug|Any CPU
 		{80479131-FE55-473E-AE68-55601AD96668}.VS|Any CPU.Build.0 = Debug|Any CPU
+		{C83C4425-6512-40CA-B725-347E1116FC6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C83C4425-6512-40CA-B725-347E1116FC6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C83C4425-6512-40CA-B725-347E1116FC6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C83C4425-6512-40CA-B725-347E1116FC6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C83C4425-6512-40CA-B725-347E1116FC6C}.VS|Any CPU.ActiveCfg = Debug|Any CPU
+		{C83C4425-6512-40CA-B725-347E1116FC6C}.VS|Any CPU.Build.0 = Debug|Any CPU
+		{FA3724D6-A509-4E2C-AA36-E74554E2622C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA3724D6-A509-4E2C-AA36-E74554E2622C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA3724D6-A509-4E2C-AA36-E74554E2622C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA3724D6-A509-4E2C-AA36-E74554E2622C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA3724D6-A509-4E2C-AA36-E74554E2622C}.VS|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA3724D6-A509-4E2C-AA36-E74554E2622C}.VS|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -460,6 +478,9 @@ Global
 		{87D27844-3A62-431A-9B53-92AFC09A1C3C} = {2B3F5AED-24B3-4915-900E-EFC58414EA29}
 		{AC65761B-5CF5-4F3E-AF60-41F977E8070D} = {2B3F5AED-24B3-4915-900E-EFC58414EA29}
 		{80479131-FE55-473E-AE68-55601AD96668} = {2B3F5AED-24B3-4915-900E-EFC58414EA29}
+		{EFBE280B-5CD1-4AE3-8C1A-1103A94F5344} = {3B62F12D-1AC1-4617-BD49-21DFFD694E70}
+		{C83C4425-6512-40CA-B725-347E1116FC6C} = {EFBE280B-5CD1-4AE3-8C1A-1103A94F5344}
+		{FA3724D6-A509-4E2C-AA36-E74554E2622C} = {EFBE280B-5CD1-4AE3-8C1A-1103A94F5344}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BA14B07C-CA29-430D-A600-F37A050636D3}

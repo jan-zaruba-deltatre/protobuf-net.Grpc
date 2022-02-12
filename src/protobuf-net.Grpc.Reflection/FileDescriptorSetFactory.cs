@@ -1,15 +1,10 @@
-﻿using Google.Protobuf.Reflection;
-using grpc.reflection.v1alpha;
-using Grpc.Core;
-using ProtoBuf.Grpc.Configuration;
-using ProtoBuf.Grpc.Internal;
-using ProtoBuf.Grpc.Reflection.Internal;
-using ProtoBuf.Meta;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
+using Google.Protobuf.Reflection;
+using ProtoBuf.Grpc.Configuration;
+using ProtoBuf.Grpc.Internal;
+using ProtoBuf.Meta;
 
 namespace ProtoBuf.Grpc.Reflection
 {

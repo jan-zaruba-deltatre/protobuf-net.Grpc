@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>10</LangVersion>
+        <rooRootNamespace></RootNamespace>ProtoBuf.Grpc.WcfConverter
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\src\protobuf-net.Grpc.Reflection\protobuf-net.Grpc.Reflection.csproj" />
+    </ItemGroup>
+
+</Project>
