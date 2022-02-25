@@ -23,7 +23,7 @@ namespace ProtoBuf.Grpc.WcfConverter
         /// <summary>Converts services from ASP.NET application</summary>
         /// <param name="applicationDirectory">Path to an ASP.NET (.NET 4.x) application</param>
         /// <param name="services">List of names of services to convert</param>
-        public string[] ConvertServices(string applicationDirectory, params string[] services)
+        public (string service, string protobuf)[] ConvertServices(string applicationDirectory, params string[] services)
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             AppDomain.CurrentDomain.TypeResolve += CurrentDomain_TypeResolve;
