@@ -10,10 +10,19 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Using Remove="System.Net.Http"/>
         <Usign Remove="System.IO" />
         <Using Include="System.IO" Alias="IO" />
     </ItemGroup>
-    
+
+    <ItemGroup>
+        <PackageReference Include="IndexRange" Version="1.0.1" />
+        <PackageReference Include="IsExternalInit" Version="1.0.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\protobuf-net.Grpc.Reflection\protobuf-net.Grpc.Reflection.csproj" />
         <ProjectReference Include="..\WcfConverter.Library\WcfConverter.Library.csproj" />

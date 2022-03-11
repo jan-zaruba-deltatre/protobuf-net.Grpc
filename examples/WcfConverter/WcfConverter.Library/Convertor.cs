@@ -40,26 +40,36 @@ namespace ProtoBuf.Grpc.WcfConverter
                 return ConvertServices(applicationDirectory, (from a in adds select a.Attribute("service").Value).ToArray());
             }
 
-            var ret = new List<string>();
+            var ret = new List<(string service, string protobuf)>();
             foreach (string service in services)
             {
-                ret.Add(ConvertService(Type.GetType(service)));
+                ret.Add((service, ConvertService(Type.GetType(service))));
             }
 
             return ret.ToArray();
 
 
-            Assembly CurrentDomain_TypeResolve(object sender, ResolveEventArgs args)
+            Assembly? CurrentDomain_TypeResolve(object sender, ResolveEventArgs args)
             {
-
+                string[] parts = args.Name.Split('.');
+                for (int i = parts.Length; i > 0; i--)
+                {
+                    string filename = IO.Path.Combine(applicationDirectory, "bin", string.Join(".", parts, 0, i) + ".dll");
+                    if (IO.File.Exists(filename))
+                        return Assembly.LoadFile(filename);
+                }
+                return null;
             }
 
-
-            Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+            Assembly? CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
             {
-
+                var an = new AssemblyName(args.Name);
+                string filename = IO.Path.Combine(applicationDirectory, "bin", an.Name + ".dll");
+                if (IO.File.Exists(filename)) return Assembly.LoadFile(filename);
+                return null;
             }
         }
+
 
         public string ConvertService(Type serviceType)
         {
@@ -94,12 +104,12 @@ namespace ProtoBuf.Grpc.WcfConverter
                 throw new ArgumentException($"Service type {serviceType.FullName} is neither class not interface", nameof(serviceType));
             }
 
-            return generator.GetSchema(serviceType);
+            return generator.GetSchema(serviceInterface);
         }
 
         protected virtual BinderConfiguration GetBinderConfiguration()
         {
-            return BinderConfiguration.Create();// marshallers, serviceBider);
+            return BinderConfiguration.Create( new List<MarshallerFactory> { new WcfMarshallerFactory ()} , new WcfBinder());
         }
     }
 }

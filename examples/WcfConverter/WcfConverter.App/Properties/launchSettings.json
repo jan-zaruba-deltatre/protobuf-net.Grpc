@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WcfConverter.App": {
+      "commandName": "Project",
+      "commandLineArgs": "c:\\Massive\\Core\\src\\Massive.Cms.Web c:\\Massive\\Core\\src\\proto"
+    }
+  }
+}

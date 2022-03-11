@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace ProtoBuf.Grpc.Configuration
@@ -222,5 +223,7 @@ namespace ProtoBuf.Grpc.Configuration
             }
             return null;
         }
+
+        public virtual Type[] GetMethodParameters(MethodInfo serviceMethod) => serviceMethod.GetParameters().Select(pt => pt.ParameterType).ToArray();
     }
 }

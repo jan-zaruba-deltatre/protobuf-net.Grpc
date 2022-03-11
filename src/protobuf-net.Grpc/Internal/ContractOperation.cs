@@ -186,15 +186,15 @@ namespace ProtoBuf.Grpc.Internal
             return TypeCategory.Invalid;
         }
 
-        internal static (TypeCategory Arg0, TypeCategory Arg1, TypeCategory Arg2, TypeCategory Ret) GetSignature(MarshallerCache marshallerCache, MethodInfo method, IBindContext? bindContext)
-            => GetSignature(marshallerCache, method.GetParameters(), method.ReturnType, bindContext);
+        internal static (TypeCategory Arg0, TypeCategory Arg1, TypeCategory Arg2, TypeCategory Ret) GetSignature(MarshallerCache marshallerCache, MethodInfo method, BinderConfiguration binderConfig, IBindContext? bindContext)
+            => GetSignature(marshallerCache, binderConfig.Binder.GetMethodParameters(method), method.ReturnType, bindContext);
 
-        private static (TypeCategory Arg0, TypeCategory Arg1, TypeCategory Arg2, TypeCategory Ret) GetSignature(MarshallerCache marshallerCache, ParameterInfo[] args, Type returnType, IBindContext? bindContext)
+        private static (TypeCategory Arg0, TypeCategory Arg1, TypeCategory Arg2, TypeCategory Ret) GetSignature(MarshallerCache marshallerCache, Type[] args, Type returnType, IBindContext? bindContext)
         {
             (TypeCategory Arg0, TypeCategory Arg1, TypeCategory Arg2, TypeCategory Ret) signature = default;
-            if (args.Length >= 1) signature.Arg0 = GetCategory(marshallerCache, args[0].ParameterType, bindContext);
-            if (args.Length >= 2) signature.Arg1 = GetCategory(marshallerCache, args[1].ParameterType, bindContext);
-            if (args.Length >= 3) signature.Arg2 = GetCategory(marshallerCache, args[2].ParameterType, bindContext);
+            if (args.Length >= 1) signature.Arg0 = GetCategory(marshallerCache, args[0], bindContext);
+            if (args.Length >= 2) signature.Arg1 = GetCategory(marshallerCache, args[1], bindContext);
+            if (args.Length >= 3) signature.Arg2 = GetCategory(marshallerCache, args[2], bindContext);
             signature.Ret = GetCategory(marshallerCache, returnType, bindContext);
             return signature;
         }
@@ -205,10 +205,10 @@ namespace ProtoBuf.Grpc.Internal
             if (method.IsGenericMethodDefinition) return false; // can't work with <T> methods
 
             if ((method.Attributes & (MethodAttributes.SpecialName)) != 0) return false; // some kind of accessor etc
-            
+
             if (!binderConfig.Binder.IsOperationContract(method, out var opName)) return false;
 
-            var args = method.GetParameters();
+            var args = binderConfig.Binder.GetMethodParameters(method);
             if (args.Length > 3) return false; // too many parameters
 
             var signature = GetSignature(binderConfig.MarshallerCache, args, method.ReturnType, bindContext);
@@ -219,9 +219,9 @@ namespace ProtoBuf.Grpc.Internal
             {
                 return index switch
                 {
-                    0 => (args[0].ParameterType, signature.Arg0),
-                    1 => (args[1].ParameterType, signature.Arg1),
-                    2 => (args[2].ParameterType, signature.Arg2),
+                    0 => (args[0], signature.Arg0),
+                    1 => (args[1], signature.Arg1),
+                    2 => (args[2], signature.Arg2),
                     RET => (method.ReturnType, signature.Ret),
                     VOID => (typeof(void), TypeCategory.Void),
                     _ => throw new IndexOutOfRangeException(nameof(index)),
