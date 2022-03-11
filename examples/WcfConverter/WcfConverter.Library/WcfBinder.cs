@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System.CodeDom;
+using System.CodeDom.Compiler;
+using System.Collections.Concurrent;
+using System.Reflection;
 using System.ServiceModel;
 using ProtoBuf.Grpc.Configuration;
 
@@ -37,6 +40,59 @@ namespace ProtoBuf.Grpc.WcfConverter
             return true;
         }
 
-        public override Type[] GetMethodParameters(MethodInfo serviceMethod) => new Type[] { new ParamsType(serviceMethod) };
+        public override Type[] GetMethodParameters(MethodInfo serviceMethod) => new[] { GetTypeForMethod(serviceMethod) };
+
+        private Type GetTypeForMethod(MethodInfo serviceMethod) => MethodTypecache.GetOrAdd(serviceMethod, CreateTypeForMethod);
+
+        protected virtual Type CreateTypeForMethod(MethodInfo method)
+        {
+            var code = new CodeCompileUnit()
+            {
+                //ReferencedAssemblies = { typeof(string).Assembly.FullName }
+            };
+            var ns = new CodeNamespace(method.DeclaringType.Namespace + "." +
+                (method.DeclaringType.IsInterface && method.DeclaringType.Name.StartsWith("I") ? method.DeclaringType.Name.Substring(1) : method.DeclaringType.Name));
+            code.Namespaces.Add(ns);
+            var cls = new CodeTypeDeclaration(method.Name + "Parameters") { Attributes = MemberAttributes.Public, IsClass = true };
+            ns.Types.Add(cls);
+            foreach (var param in method.GetParameters())
+            {
+                cls.Members.Add(CreateBackingField(param));
+                cls.Members.Add(CreateProperty(param));
+                if (param.ParameterType.Assembly != typeof(string).Assembly)
+                    code.ReferencedAssemblies.Add(param.ParameterType.Assembly.GetName().Name);
+            }
+
+            using var provider = CodeDomProvider.CreateProvider("CSharp");
+            CompilerParameters options = new CompilerParameters() { GenerateExecutable = false, GenerateInMemory = true, OutputAssembly = ns.Name };
+            using var w = new IO.StringWriter();
+            provider.GenerateCodeFromCompileUnit(code, w, new CodeGeneratorOptions() { BlankLinesBetweenMembers = true, BracingStyle = "C", IndentString = "    ", VerbatimOrder = true });
+            string cs = w.GetStringBuilder().ToString();
+            var result = provider.CompileAssemblyFromDom(options, code);
+            if (result.Errors.HasErrors)
+                throw new ApplicationException("Failed to compile dynamic code\r\n" + String.Join("\r\n", from err in result.Errors.Cast<CompilerError>() select $"{err.ErrorNumber}: {err.ErrorText}") + "\r\nThe code was\r\n" + cs);
+            return result.CompiledAssembly.GetType(ns.Name + "." + cls.Name);
+        }
+
+        private CodeMemberField CreateBackingField(ParameterInfo param) => new CodeMemberField
+        {
+            Name = "_" + param.Name,
+            Type = new CodeTypeReference(param.ParameterType, CodeTypeReferenceOptions.GlobalReference),
+            Attributes = MemberAttributes.Private
+        };
+
+        private CodeMemberProperty CreateProperty(ParameterInfo param) => new CodeMemberProperty()
+        {
+            Name = char.ToUpperInvariant(param.Name[0]) + param.Name.Substring(1),
+            Type = new CodeTypeReference(param.ParameterType, CodeTypeReferenceOptions.GlobalReference),
+            HasGet = true,
+            HasSet = true,
+            Attributes = MemberAttributes.Public,
+            GetStatements = { new CodeMethodReturnStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_" + param.Name)) },
+            SetStatements = { new CodeAssignStatement(new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_" + param.Name), new CodePropertySetValueReferenceExpression()) }
+        };
+
+        private static readonly ConcurrentDictionary<MethodInfo, Type> MethodTypecache = new ConcurrentDictionary<MethodInfo, Type>();
+
     }
 }

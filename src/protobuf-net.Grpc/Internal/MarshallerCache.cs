@@ -14,29 +14,22 @@ namespace ProtoBuf.Grpc.Internal
             => _factories = factories ?? throw new ArgumentNullException(nameof(factories));
         internal bool CanSerializeType(Type type)
         {
-            foreach (var factory in _factories)
-            {
-                if (factory.CanSerialize(type))
-                {
-                    SlowImpl(this, type, factory);
-                    return true;
-                }
-            }
-            return false;
+            if (_marshallers.TryGetValue(type, out var obj)) return obj != null;
+            return SlowImpl(this, type);
 
-            static void SlowImpl(MarshallerCache obj, Type type, MarshallerFactory factory)
-                => _createAndAdd.MakeGenericMethod(type).Invoke(obj, new object[] { factory });
+            static bool SlowImpl(MarshallerCache obj, Type type)
+                => _createAndAdd.MakeGenericMethod(type).Invoke(obj, Array.Empty<object>()) != null;
         }
         static readonly MethodInfo _createAndAdd = typeof(MarshallerCache).GetMethod(
-            nameof(CreateAndAdd), BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(MarshallerFactory) }, null)!;
+            nameof(CreateAndAdd), BindingFlags.Instance | BindingFlags.NonPublic)!;
 
         private readonly ConcurrentDictionary<Type, object?> _marshallers
             = new ConcurrentDictionary<Type, object?>
-            {
+        {
 #pragma warning disable CS0618 // Empty
-                [typeof(Empty)] = Empty.Marshaller
+            [typeof(Empty)] = Empty.Marshaller
 #pragma warning restore CS0618
-            };
+        };
 
         internal Marshaller<T> GetMarshaller<T>()
         {
@@ -59,17 +52,20 @@ namespace ProtoBuf.Grpc.Internal
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private Marshaller<T>? CreateAndAdd<T>(MarshallerFactory factory) =>
-            _marshallers.GetOrAdd(typeof(T), () => factory.CreateMarshaller<T>()) as Marshaller<T>;
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
         private Marshaller<T>? CreateAndAdd<T>()
+        {
+            object? obj = CreateMarshaller<T>();
+            if (!_marshallers.TryAdd(typeof(T), obj)) obj= _marshallers[typeof(T)];
+            return obj as Marshaller<T>;
+        }
+        private Marshaller<T>? CreateMarshaller<T>()
         {
             foreach (var factory in _factories)
             {
-                if (factory.CanSerialize(typeof(T))) return CreateAndAdd<T>(factory);
+                if (factory.CanSerialize(typeof(T)))
+                    return factory.CreateMarshaller<T>(); 
             }
-            return _marshallers.TryGetValue(typeof(T), out object? ret) ? null : ret as Marshaller<T>;
+            return null;
         }
 
         internal MarshallerFactory? TryGetFactory(Type type)

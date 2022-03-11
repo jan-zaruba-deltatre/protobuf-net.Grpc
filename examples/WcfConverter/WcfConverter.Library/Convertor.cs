@@ -109,7 +109,7 @@ namespace ProtoBuf.Grpc.WcfConverter
 
         protected virtual BinderConfiguration GetBinderConfiguration()
         {
-            return BinderConfiguration.Create( new List<MarshallerFactory> { new WcfMarshallerFactory ()} , new WcfBinder());
+            return BinderConfiguration.Create(binder: new WcfBinder());
         }
     }
 }
