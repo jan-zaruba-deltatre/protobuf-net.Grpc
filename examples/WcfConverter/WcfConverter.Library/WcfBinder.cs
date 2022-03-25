@@ -1,6 +1,7 @@
 ﻿using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Concurrent;
+using System.Collections.Specialized;
 using System.Reflection;
 using System.ServiceModel;
 using ProtoBuf.Grpc.Configuration;
@@ -19,7 +20,7 @@ namespace ProtoBuf.Grpc.WcfConverter
                 if (contract != null)
                 {
                     name = contract.Name ?? GetDefaultName(contractType);
-                    return true;
+                        return true;
                 }
             }
 
@@ -59,8 +60,11 @@ namespace ProtoBuf.Grpc.WcfConverter
             {
                 cls.Members.Add(CreateBackingField(param));
                 cls.Members.Add(CreateProperty(param));
-                if (param.ParameterType.Assembly != typeof(string).Assembly)
-                    code.ReferencedAssemblies.Add(param.ParameterType.Assembly.GetName().Name);
+                if (param.ParameterType.Assembly != typeof(string).Assembly && !code.ReferencedAssemblies.Contains(param.ParameterType.Assembly.Location))
+                {
+                    code.ReferencedAssemblies.Add(param.ParameterType.Assembly.Location);
+                    AddDependentAssemblies(code.ReferencedAssemblies, param.ParameterType.Assembly);
+                }
             }
 
             using var provider = CodeDomProvider.CreateProvider("CSharp");
@@ -69,9 +73,24 @@ namespace ProtoBuf.Grpc.WcfConverter
             provider.GenerateCodeFromCompileUnit(code, w, new CodeGeneratorOptions() { BlankLinesBetweenMembers = true, BracingStyle = "C", IndentString = "    ", VerbatimOrder = true });
             string cs = w.GetStringBuilder().ToString();
             var result = provider.CompileAssemblyFromDom(options, code);
+            //Assembly.LoadWithPartialName()
+            //options.ReferencedAssemblies
             if (result.Errors.HasErrors)
                 throw new ApplicationException("Failed to compile dynamic code\r\n" + String.Join("\r\n", from err in result.Errors.Cast<CompilerError>() select $"{err.ErrorNumber}: {err.ErrorText}") + "\r\nThe code was\r\n" + cs);
             return result.CompiledAssembly.GetType(ns.Name + "." + cls.Name);
+        }
+
+        private static void AddDependentAssemblies(StringCollection referencedAssemblies, Assembly assembly)
+        {
+            foreach (var referencedAssemblyName in assembly.GetReferencedAssemblies())
+            {
+                var referencedAssembly = Assembly.Load(referencedAssemblyName);
+                if (!referencedAssemblies.Contains(referencedAssembly.Location))
+                {
+                    referencedAssemblies.Add(referencedAssembly.Location);
+                    AddDependentAssemblies(referencedAssemblies, referencedAssembly);
+                }
+            }
         }
 
         private CodeMemberField CreateBackingField(ParameterInfo param) => new CodeMemberField

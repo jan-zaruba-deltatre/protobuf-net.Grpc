@@ -13,6 +13,7 @@ var (applicationFolder, outputFolder, serviceNames) = (args[0], args[1], args.Sk
 var services = convertor.ConvertServices(applicationFolder, serviceNames);
 foreach (var (service, protobuf) in services)
 {
+    Console.WriteLine(service);
     string outfile = IO.Path.Combine(outputFolder, service + ".proto");
     IO.File.WriteAllText(outfile, protobuf);
 }
